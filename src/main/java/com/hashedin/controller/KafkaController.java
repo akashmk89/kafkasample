@@ -1,4 +1,5 @@
 package com.hashedin.controller;
+import com.hashedin.service.KafkaStreamProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -13,7 +14,11 @@ import java.util.Map;
 public class KafkaController {
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
-    private static final String Topic = "trades";
+
+    @Autowired
+    private KafkaStreamProcessor streamProcessor;
+
+    private static final String Topic = "stocks";
     @GetMapping("/produce")
     public String postToKafka(@RequestParam String key, @RequestParam Integer value){
         Map<String, Integer> map = new HashMap<String,Integer>();
@@ -23,8 +28,13 @@ public class KafkaController {
 //                "E", "F", new Date(),200, "5*","25", "A", "dsjdk");
         kafkaTemplate.send(Topic, finalValue );
         return "published to kafka successfully";
-
-
     }
+
+    @GetMapping("/consume")
+    public String consumeStreamFromKafka(){
+            streamProcessor.streamConsumer();
+        return "Stream consuming successful";
+    }
+
 }
 
